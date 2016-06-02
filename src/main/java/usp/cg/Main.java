@@ -22,7 +22,7 @@ public class Main {
      * Inicializa o display e a engine
      */
     private void init() {
-        int width = 600, height = 300;
+        int width = 800, height = 600;
         this.running = true;
 
         if(glfwInit() != GL_TRUE){
