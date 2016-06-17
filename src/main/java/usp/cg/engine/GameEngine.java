@@ -58,7 +58,7 @@ public class GameEngine implements Runnable {
         float interval = 1f / TARGET_UPS;
 
         boolean running = true;
-        while (running && !window.windowShouldClose()) {
+        while (running && (window.windowShouldClose() != 1)) {
             ellapsedTime = timer.getEllapsedTime();
             accumulator += ellapsedTime;
 

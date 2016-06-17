@@ -43,7 +43,7 @@ public class Window {
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
 
         // Initialize GLFW. Most GLFW functions will not work before doing this.
-        if (!glfwInit()) {
+        if (glfwInit() == 0) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
 
@@ -76,7 +76,7 @@ public class Window {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-                    glfwSetWindowShouldClose(window, true);
+                    glfwSetWindowShouldClose(window, 1);
                 }
             }
         });
@@ -128,7 +128,7 @@ public class Window {
         return glfwGetKey(windowHandle, keyCode) == GLFW_PRESS;
     }
 
-    public boolean windowShouldClose() {
+    public int windowShouldClose() {
         return glfwWindowShouldClose(windowHandle);
     }
 
