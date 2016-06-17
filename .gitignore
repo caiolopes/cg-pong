@@ -1,10 +1,4 @@
 .idea/
-.gradle/
-build/
 .DS_Store
-nbproject/private/
-nbbuild/
-dist/
-nbdist/
-nbactions.xml
-.nb-gradle/
+target/
+*.iml
