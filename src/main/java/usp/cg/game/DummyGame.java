@@ -39,12 +39,16 @@ public class DummyGame implements IGameLogic {
 
     private Ball ball;
 
-    static float FieldSizeY = 2f;
+    static float FieldSizeZ = 2f;
 
     private int ScoreL = 0;
 
     private int ScoreR = 0;
     // end game
+
+    public static float blockScale = 0.2f;
+    public static float skyBoxScale = 9.0f;
+    public static float extension = 1.0f;
 
 
     public DummyGame() {
@@ -67,10 +71,6 @@ public class DummyGame implements IGameLogic {
         Material material = new Material(texture, reflectance);
         mesh.setMaterial(material);
         
-        float blockScale = 0.2f;        
-        float skyBoxScale = 9.0f;
-        float extension = 1.0f;
-        
         float startx = extension * (-skyBoxScale + blockScale);
         float startz = extension * (skyBoxScale - blockScale);
         float starty = -1.0f;
@@ -88,18 +88,8 @@ public class DummyGame implements IGameLogic {
                 GameItem gameItem = new GameItem(mesh);
                 gameItem.setScale(blockScale);
                 //incy = Math.random() > 0.9f ? blockScale * 2 : 0f;
-                if ((i == (NUM_ROWS/5) || i == (NUM_ROWS/5)*3) && (j >= (NUM_COLS/8) && j <= (NUM_COLS/8)*6)) {
-                    incy = blockScale * 2;
-                    if (!firstLeft) {
-                        firstLeft = true;
-                        System.out.println("X: " + posx + "Z: " + posz);
-                    }
-                }
-                else if (i > NUM_ROWS/5 && i < (NUM_ROWS/5)*3 && (j == (NUM_COLS/8) || j == (NUM_COLS/8)*6)) {
-                    incy = blockScale * 2;
-                } else {
-                    incy = 0f;
-                }
+                incy = (posz == 1.9999996f || posz == -2.0000002f ) ? blockScale * 2 : 0f;
+
                 gameItem.setPosition(posx, starty + incy, posz);
                 gameItems[i*NUM_COLS + j] = gameItem;
                 
@@ -130,14 +120,18 @@ public class DummyGame implements IGameLogic {
         gameItems[gameItems.length-1] = right;
 
         ball.setScale(0.1f);
-        ball.setPosition(0, 0, -10f);
-        left.setScale(0.4f);
-        left.setPosition(-5.5f, 0, -10f);
-        right.setScale(0.4f);
-        right.setPosition(2f, 0, -10f);
+        ball.setPosition(0, -0.5f, -10f);
+        left.setScale(0.35f);
+        left.setPosition(-3f, -0.5f, -10f);
+        right.setScale(0.35f);
+        right.setPosition(3f, -0.5f, -10f);
 
-        while (ball.vx == 0)
-            ball.vx = (new Random().nextInt(3))*Ball.SPEEDX;
+        while (ball.vx == 0) {
+            if ((new Random().nextInt(2)) == 0)
+                ball.vx = -(new Random().nextInt(2)) * Ball.SPEEDX;
+            else
+                ball.vx = (new Random().nextInt(2)) * Ball.SPEEDX;
+        }
 
         ball.vz = 0;
         ball.position.x = 0;

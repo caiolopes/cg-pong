@@ -6,8 +6,8 @@ import usp.cg.engine.graph.Mesh;
 class Reflector extends GameItem {
     float vy;
     boolean Down, Up, hold;
-    static float HEIGHT = 1f;
-    static float WIDTH = 0.2f;
+    static float HEIGHT = 0.8f;
+    static float WIDTH = 0.1f;
     static float SPEEDY = 0.02f;
 
     Reflector(Mesh mesh) {
@@ -20,12 +20,12 @@ class Reflector extends GameItem {
 
     void move() {
         this.position.z += vy;
-        if(this.position.z <= -DummyGame.FieldSizeY){
-            this.position.z = -DummyGame.FieldSizeY+0.01f;
+        if(this.position.z <= -DummyGame.FieldSizeZ + HEIGHT){
+            this.position.z = -DummyGame.FieldSizeZ +0.01f + HEIGHT;
             vy = 0;
         }
-        if(this.position.z >= DummyGame.FieldSizeY){
-            this.position.z = DummyGame.FieldSizeY-0.01f;
+        if(this.position.z >= DummyGame.FieldSizeZ - HEIGHT){
+            this.position.z = DummyGame.FieldSizeZ -0.01f - HEIGHT;
             vy = 0;
         }
     }
