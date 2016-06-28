@@ -1,9 +1,9 @@
 package usp.cg.engine;
 
 import org.joml.Vector3f;
-import usp.cg.engine.graph.DirectionalLight;
-import usp.cg.engine.graph.PointLight;
-import usp.cg.engine.graph.SpotLight;
+import usp.cg.engine.graphics.DirectionalLight;
+import usp.cg.engine.graphics.PointLight;
+import usp.cg.engine.graphics.SpotLight;
 
 public class SceneLight {
 
@@ -14,6 +14,9 @@ public class SceneLight {
     private SpotLight[] spotLightList;
     
     private DirectionalLight directionalLight;
+
+    public SceneLight() {
+    }
 
     public Vector3f getAmbientLight() {
         return ambientLight;
@@ -27,16 +30,8 @@ public class SceneLight {
         return pointLightList;
     }
 
-    public void setPointLightList(PointLight[] pointLightList) {
-        this.pointLightList = pointLightList;
-    }
-
     public SpotLight[] getSpotLightList() {
         return spotLightList;
-    }
-
-    public void setSpotLightList(SpotLight[] spotLightList) {
-        this.spotLightList = spotLightList;
     }
 
     public DirectionalLight getDirectionalLight() {

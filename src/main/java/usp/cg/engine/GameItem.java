@@ -1,7 +1,7 @@
 package usp.cg.engine;
 
 import org.joml.Vector3f;
-import usp.cg.engine.graph.Mesh;
+import usp.cg.engine.graphics.Mesh;
 
 public class GameItem {
 
@@ -13,7 +13,7 @@ public class GameItem {
 
     private final Vector3f rotation;
 
-    public GameItem() {
+    GameItem() {
         position = new Vector3f(0, 0, 0);
         scale = 1;
         rotation = new Vector3f(0, 0, 0);
@@ -56,7 +56,7 @@ public class GameItem {
         return mesh;
     }
     
-    public void setMesh(Mesh mesh) {
+    void setMesh(Mesh mesh) {
         this.mesh = mesh;
     }
 }

@@ -2,9 +2,9 @@ package usp.cg.engine;
 
 public class GameEngine implements Runnable {
 
-    public static final int TARGET_FPS = 75;
+    private static final int TARGET_FPS = 75;
 
-    public static final int TARGET_UPS = 30;
+    private static final int TARGET_UPS = 30;
 
     private final Window window;
 
@@ -12,11 +12,11 @@ public class GameEngine implements Runnable {
 
     private final Timer timer;
 
-    private final IGameLogic gameLogic;
+    private final GameInterface gameLogic;
 
     private final MouseInput mouseInput;
 
-    public GameEngine(String windowTitle, int width, int height, boolean vSync, IGameLogic gameLogic) throws Exception {
+    public GameEngine(String windowTitle, int width, int height, boolean vSync, GameInterface gameLogic) throws Exception {
         gameLoopThread = new Thread(this, "GAME_LOOP_THREAD");
         window = new Window(windowTitle, width, height, vSync);
         mouseInput = new MouseInput();
@@ -45,20 +45,19 @@ public class GameEngine implements Runnable {
         }
     }
 
-    protected void init() throws Exception {
+    private void init() throws Exception {
         window.init();
         timer.init();
         mouseInput.init(window);
         gameLogic.init(window);
     }
 
-    protected void gameLoop() {
+    private void gameLoop() {
         float ellapsedTime;
         float accumulator = 0f;
         float interval = 1f / TARGET_UPS;
 
-        boolean running = true;
-        while (running && (window.windowShouldClose() != 1)) {
+        while (window.windowShouldClose() != 1) {
             ellapsedTime = timer.getEllapsedTime();
             accumulator += ellapsedTime;
 
@@ -77,7 +76,7 @@ public class GameEngine implements Runnable {
         }
     }
 
-    protected void cleanup() {
+    private void cleanup() {
         gameLogic.cleanup();                
     }
     
@@ -87,21 +86,21 @@ public class GameEngine implements Runnable {
         while (timer.getTime() < endTime) {
             try {
                 Thread.sleep(1);
-            } catch (InterruptedException ie) {
+            } catch (InterruptedException ignored) {
             }
         }
     }
 
-    protected void input() {
+    private void input() {
         mouseInput.input(window);
         gameLogic.input(window, mouseInput);
     }
 
-    protected void update(float interval) {
+    private void update(float interval) {
         gameLogic.update(interval, mouseInput);
     }
 
-    protected void render() {
+    private void render() {
         gameLogic.render(window);
         window.update();
     }

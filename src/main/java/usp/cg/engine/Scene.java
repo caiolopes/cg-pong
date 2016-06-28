@@ -1,6 +1,6 @@
 package usp.cg.engine;
 
-import usp.cg.engine.graph.Mesh;
+import usp.cg.engine.graphics.Mesh;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ public class Scene {
 
     private Map<Mesh, List<GameItem>> meshMap;
     
-    private SkyBox skyBox;
+    private MapCube mapCube;
     
     private SceneLight sceneLight;
 
@@ -37,12 +37,12 @@ public class Scene {
         }
     }
 
-    public SkyBox getSkyBox() {
-        return skyBox;
+    public MapCube getMapCube() {
+        return mapCube;
     }
 
-    public void setSkyBox(SkyBox skyBox) {
-        this.skyBox = skyBox;
+    public void setMapCube(MapCube mapCube) {
+        this.mapCube = mapCube;
     }
 
     public SceneLight getSceneLight() {

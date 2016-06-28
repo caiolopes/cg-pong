@@ -1,7 +1,7 @@
 package usp.cg.game;
 
 import usp.cg.engine.GameItem;
-import usp.cg.engine.graph.Mesh;
+import usp.cg.engine.graphics.Mesh;
 
 import static java.lang.Math.abs;
 
@@ -15,14 +15,14 @@ class Ball extends GameItem {
         super(mesh);
     }
 
-    void reflection(Reflector left, Reflector right) {
+    void reflection(Pencil left, Pencil right) {
         if((this.position.z <= -Game.FieldSizeZ + Game.blockScale*2)||(this.position.z >= Game.FieldSizeZ - Game.blockScale*2))
             vz = -vz;
-        if((this.position.x - WIDTH <= left.getPosition().x+Reflector.WIDTH)&&(abs((this.position.z - left.getPosition().z)) <= Reflector.HEIGHT + abs(vz))){
+        if((this.position.x - WIDTH <= left.getPosition().x+ Pencil.WIDTH)&&(abs((this.position.z - left.getPosition().z)) <= Pencil.HEIGHT + abs(vz))){
             vx = -vx;
             vz += left.vy;
         }
-        if((this.position.x + WIDTH >= + right.getPosition().x-Reflector.WIDTH)&&(abs((double)(this.position.z - right.getPosition().z)) <= Reflector.HEIGHT + abs(vz))){
+        if((this.position.x + WIDTH >= + right.getPosition().x- Pencil.WIDTH)&&(abs((double)(this.position.z - right.getPosition().z)) <= Pencil.HEIGHT + abs(vz))){
             vx = -vx;
             vz += right.vy;
         }
@@ -30,16 +30,16 @@ class Ball extends GameItem {
 
     // Verifica se algum dos refletores esta segurando a bola
     // caso positivo, reposiciona a bola pro local correto
-    void care(Reflector reflector) {
-        if(reflector.hold) {
+    void care(Pencil pencil) {
+        if(pencil.hold) {
             this.vx = 0;
-            if(reflector.getPosition().x < 0)
-                this.position.x = reflector.getPosition().x + 2*Reflector.WIDTH;
-            if(reflector.getPosition().x > 0)
-                this.position.x = reflector.getPosition().x - 2*Reflector.WIDTH;
+            if(pencil.getPosition().x < 0)
+                this.position.x = pencil.getPosition().x + 2* Pencil.WIDTH;
+            if(pencil.getPosition().x > 0)
+                this.position.x = pencil.getPosition().x - 2* Pencil.WIDTH;
 
-            this.vz = reflector.vy;
-            this.position.z = reflector.getPosition().z;
+            this.vz = pencil.vy;
+            this.position.z = pencil.getPosition().z;
         }
     }
 

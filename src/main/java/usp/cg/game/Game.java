@@ -3,7 +3,7 @@ package usp.cg.game;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import usp.cg.engine.*;
-import usp.cg.engine.graph.*;
+import usp.cg.engine.graphics.*;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +15,7 @@ import static org.lwjgl.glfw.GLFW.*;
  * Classe principal que impleta a interface de lógica do jogo, que inclui ler teclas do teclado, atualizar, inicializar,
  * etc.
  */
-public class Game implements IGameLogic {
+class Game implements GameInterface {
 
     private static final float MOUSE_SENSITIVITY = 0.2f;
 
@@ -31,11 +31,9 @@ public class Game implements IGameLogic {
 
     private static final float CAMERA_POS_STEP = 0.05f;
 
-    private boolean isRunning = true;
+    private Pencil left;
 
-    private Reflector left;
-
-    private Reflector right;
+    private Pencil right;
 
     private Ball ball;
 
@@ -56,12 +54,10 @@ public class Game implements IGameLogic {
     private int rightUp = GLFW_KEY_UP;
     private int rightDown = GLFW_KEY_DOWN;
 
-    public static float blockScale = 0.2f;
-    public static float skyBoxScale = 9.0f;
-    public static float extension = 1.0f;
+    static float blockScale = 0.2f;
 
 
-    public Game() {
+    Game() {
         renderer = new Renderer();
         camera = new Camera();
         cameraInc = new Vector3f(0.0f, 0.0f, 0.0f);
@@ -71,44 +67,43 @@ public class Game implements IGameLogic {
     @Override
     public void init(Window window) throws Exception {
         mWindow = window;
-        renderer.init(mWindow);
+        renderer.init();
 
         scene = new Scene();
         
         float reflectance = 1f;
         Mesh mesh = OBJLoader.loadMesh("/models/cube.obj");
-        Texture texture = new Texture("/textures/grassblock.png");
+        Texture texture = new Texture("/textures/block.png");
         Material material = new Material(texture, reflectance);
         mesh.setMaterial(material);
-        
+
+        float skyBoxScale = 9.0f;
+        float extension = 1.0f;
         float startx = extension * (-skyBoxScale + blockScale);
         float startz = extension * (skyBoxScale - blockScale);
         float starty = -1.0f;
         float inc = blockScale * 2;
-        
+
         float posx = startx;
         float posz = startz;
         float incy = 0.0f;
         int NUM_ROWS = (int)(extension * skyBoxScale * 2 / inc);
         int NUM_COLS = (int)(extension * skyBoxScale * 2/ inc);
         GameItem[] gameItems  = new GameItem[(NUM_ROWS * NUM_COLS) + 3];
-        boolean firstLeft = false;
         for(int i=0; i<NUM_ROWS; i++) {
             for(int j=0; j<NUM_COLS; j++) {
                 GameItem gameItem = new GameItem(mesh);
                 gameItem.setScale(blockScale);
-                //incy = Math.random() > 0.9f ? blockScale * 2 : 0f;
                 incy = (posz == 1.9999996f || posz == -2.0000002f ) ? blockScale * 2 : 0f;
 
                 gameItem.setPosition(posx, starty + incy, posz);
                 gameItems[i*NUM_COLS + j] = gameItem;
-                
+
                 posx += inc;
             }
             posx = startx;
             posz -= inc;
         }
-
         mesh = OBJLoader.loadMesh("/models/cube.obj");
         texture = new Texture("/textures/eraser.png");
         material = new Material(texture, reflectance);
@@ -117,13 +112,13 @@ public class Game implements IGameLogic {
         ball = new Ball(mesh);
         gameItems[gameItems.length-3] = ball;
 
-        mesh = OBJLoader.loadMesh("/models/Pencil.obj");
+        mesh = OBJLoader.loadMesh("/models/pencil.obj");
         texture = new Texture("/textures/pencil.png");
         material = new Material(texture, reflectance);
         mesh.setMaterial(material);
 
-        left = new Reflector(mesh);
-        right = new Reflector(mesh);
+        left = new Pencil(mesh);
+        right = new Pencil(mesh);
 
         gameItems[gameItems.length-2] = left;
         gameItems[gameItems.length-1] = right;
@@ -133,9 +128,9 @@ public class Game implements IGameLogic {
 
         initialPositions();
 
-        SkyBox skyBox = new SkyBox("/models/skybox.obj", "/textures/skybox.png");
-        skyBox.setScale(skyBoxScale);
-        scene.setSkyBox(skyBox);
+        MapCube mapCube = new MapCube("/models/mapcube.obj", "/textures/mapcube.png");
+        mapCube.setScale(skyBoxScale);
+        scene.setMapCube(mapCube);
 
         setupLights();
 
@@ -182,12 +177,12 @@ public class Game implements IGameLogic {
             gameOver = true;
             return false;
         }
-        if(ball.position.x + Ball.WIDTH < left.position.x + Reflector.WIDTH - Ball.SPEEDX){
+        if(ball.position.x + Ball.WIDTH < left.position.x + Pencil.WIDTH - Ball.SPEEDX){
             right.hold = true;
             this.ScoreR++;
             glfwSetWindowTitle(mWindow.getWindowHandle(), "Pong - " + this.ScoreL + " x " + this.ScoreR);
         }
-        if(ball.position.x - Ball.WIDTH > right.position.x - Reflector.WIDTH + Ball.SPEEDX){
+        if(ball.position.x - Ball.WIDTH > right.position.x - Pencil.WIDTH + Ball.SPEEDX){
             left.hold = true;
             this.ScoreL++;
             glfwSetWindowTitle(mWindow.getWindowHandle(), "Pong - " + this.ScoreL + " x " + this.ScoreR);
@@ -258,21 +253,16 @@ public class Game implements IGameLogic {
         }
 
         if((left.Down)&&(!left.Up))
-            left.vy = Reflector.SPEEDY;
+            left.vy = Pencil.SPEEDY;
 
         if((!left.Down)&&(left.Up))
-            left.vy = -Reflector.SPEEDY;
+            left.vy = -Pencil.SPEEDY;
 
         if((right.Down)&&(!right.Up))
-            right.vy = Reflector.SPEEDY;
+            right.vy = Pencil.SPEEDY;
 
         if((!right.Down)&&(right.Up))
-            right.vy = -Reflector.SPEEDY;
-
-        if (window.isKeyPressed(GLFW_KEY_C)) {
-            System.out.println("Camera pos x:" + camera.getPosition().x + ", y: "+ camera.getPosition().y + ", z: " + camera.getPosition().z);
-            System.out.println("Camera rot x:" + camera.getRotation().x + ", y: "+ camera.getRotation().y + ", z: " + camera.getRotation().z);
-        }
+            right.vy = -Pencil.SPEEDY;
 
         cameraInc.set(0, 0, 0);
 
@@ -295,7 +285,7 @@ public class Game implements IGameLogic {
         if (window.isKeyPressed(GLFW_KEY_L)) {
             SceneLight sceneLight = scene.getSceneLight();
 
-            // Update directional light direction, intensity and colour
+            // Atualiza a direcao da luz direcional, a intensidade e a cor
             DirectionalLight directionalLight = sceneLight.getDirectionalLight();
             lightAngle += 1.1f;
             if (lightAngle > 90) {
@@ -338,14 +328,13 @@ public class Game implements IGameLogic {
         left.vy = 0;
         right.vy = 0;
 
-
-        // Update camera based on mouse            
+        // Atualiza a camera baseado no mouse
         if (mouseInput.isRightButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
         }
 
-        // Update camera position
+        // Atualiza a posicao da camera
         camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
     }
 

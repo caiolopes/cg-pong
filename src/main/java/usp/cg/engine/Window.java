@@ -20,12 +20,6 @@ public class Window {
 
     private long windowHandle;
 
-    private GLFWErrorCallback errorCallback;
-
-    private GLFWKeyCallback keyCallback;
-
-    private GLFWWindowSizeCallback windowSizeCallback;
-
     private boolean resized;
 
     private boolean vSync;
@@ -39,8 +33,8 @@ public class Window {
     }
 
     public void init() {
-        // Setup an error callback. The default implementation
-        // will print the error message in System.err.
+        // Configura o callback do erro. A implementacao padrao vai imprimir atraves do System.err
+        GLFWErrorCallback errorCallback;
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
 
         // Initialize GLFW. Most GLFW functions will not work before doing this.
@@ -48,21 +42,22 @@ public class Window {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
 
-        glfwDefaultWindowHints(); // optional, the current window hints are already the default
-        glfwWindowHint(GLFW_VISIBLE, GL_FALSE); // the window will stay hidden after creation
-        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        glfwDefaultWindowHints(); // opcional, as dicas da janela ja eh o default
+        glfwWindowHint(GLFW_VISIBLE, GL_FALSE); // a janela vai permanecer escondida apos a criacao
+        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // ativa poder redimensioanr a janela
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // versao major do OpenGL eh a 3
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2); // versao minor da OpenGL eh a 2
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-        // Create the window
+        // Cria a janela
         windowHandle = glfwCreateWindow(width, height, title, NULL, NULL);
         if (windowHandle == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
 
-        // Setup resize callback
+        // Configura o callback para redimensionar
+        GLFWWindowSizeCallback windowSizeCallback;
         glfwSetWindowSizeCallback(windowHandle, windowSizeCallback = new GLFWWindowSizeCallback() {
             @Override
             public void invoke(long window, int width, int height) {
@@ -72,7 +67,8 @@ public class Window {
             }
         });
 
-        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
+        // Configura o callback do teclado. Eh chamado cada vez que uma tecla eh pressionada, repetida, ou liberada.
+        GLFWKeyCallback keyCallback;
         glfwSetKeyCallback(windowHandle, keyCallback = new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
@@ -82,33 +78,33 @@ public class Window {
             }
         });
 
-        // Get the resolution of the primary monitor
+        // Pega a resolução do monitor principal
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        // Center our window
+        // Centraliza a janela
         glfwSetWindowPos(
                 windowHandle,
                 (vidmode.width() - width) / 2,
                 (vidmode.height() - height) / 2
         );
-        // Make the OpenGL context current
+        // Faz do OpenGL o contexto atual
         glfwMakeContextCurrent(windowHandle);
 
         if (isvSync()) {
-            // Enable v-sync
+            // Ativa o v-sync
             glfwSwapInterval(1);
         }
 
-        // Make the window visible
+        // Mostra a janela
         glfwShowWindow(windowHandle);
 
         GL.createCapabilities();
 
-        // Set the clear color
+        // Configura a cor do fundo
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glEnable(GL_DEPTH_TEST);
         //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         
-        // Support for transparencies
+        // Ativa transparencias
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

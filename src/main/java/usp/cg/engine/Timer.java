@@ -1,25 +1,25 @@
 package usp.cg.engine;
 
-public class Timer {
+class Timer {
 
     private double lastLoopTime;
     
-    public void init() {
+    void init() {
         lastLoopTime = getTime();
     }
 
-    public double getTime() {
+    double getTime() {
         return System.nanoTime() / 1000_000_000.0;
     }
 
-    public float getEllapsedTime() {
+    float getEllapsedTime() {
         double time = getTime();
         float ellapsedTime = (float) (time - lastLoopTime);
         lastLoopTime = time;
         return ellapsedTime;
     }
 
-    public double getLastLoopTime() {
+    double getLastLoopTime() {
         return lastLoopTime;
     }
 }
