@@ -133,12 +133,10 @@ public class Game implements IGameLogic {
 
         initialPositions();
 
-        // Setup  SkyBox
         SkyBox skyBox = new SkyBox("/models/skybox.obj", "/textures/skybox.png");
         skyBox.setScale(skyBoxScale);
         scene.setSkyBox(skyBox);
-        
-        // Setup Lights
+
         setupLights();
 
         cameraTop();
@@ -155,7 +153,7 @@ public class Game implements IGameLogic {
     }
 
     private void cameraFirstPlayer() {
-        camera.setPosition(-4.1533113f, 1.289994f, -0.07619885f);
+        camera.setPosition(-4.353383f, 1.289994f, -0.026490219f);
         camera.setRotation(36.7703f, 90.08346f, 0f);
 
         leftUp = GLFW_KEY_A;
@@ -165,12 +163,12 @@ public class Game implements IGameLogic {
     }
 
     private void initialPositions() {
-        ball.setScale(0.1f);
-        ball.setPosition(0, -0.5f, -10f);
-        left.setScale(0.35f);
-        left.setPosition(-3f, -0.5f, -10f);
-        right.setScale(0.35f);
-        right.setPosition(3f, -0.5f, -10f);
+        ball.setScale(0.09f);
+        ball.setPosition(0, -0.5f, 0f);
+        left.setScale(0.25f);
+        left.setPosition(-3f, -0.6f, 0f);
+        right.setScale(0.25f);
+        right.setPosition(3f, -0.6f, 0f);
 
         ball.vz = 0;
         ball.position.x = 0;
@@ -179,17 +177,17 @@ public class Game implements IGameLogic {
 
     private boolean win() {
         if((this.ScoreL == 5)||(this.ScoreR == 5)) {
-            glfwSetWindowTitle(mWindow.getWindowHandle(), "GAME OVER! Pressione enter para novo jogo" + this.ScoreR + " x " + this.ScoreL);
+            glfwSetWindowTitle(mWindow.getWindowHandle(), "GAME OVER! Pressione enter para novo jogo");
             gameStart = false;
             gameOver = true;
             return false;
         }
-        if(ball.position.x < left.position.x + Reflector.WIDTH - Ball.SPEEDX){
+        if(ball.position.x + Ball.WIDTH < left.position.x + Reflector.WIDTH - Ball.SPEEDX){
             right.hold = true;
             this.ScoreR++;
             glfwSetWindowTitle(mWindow.getWindowHandle(), "Pong - " + this.ScoreL + " x " + this.ScoreR);
         }
-        if(ball.position.x > right.position.x - Reflector.WIDTH + Ball.SPEEDX){
+        if(ball.position.x - Ball.WIDTH > right.position.x - Reflector.WIDTH + Ball.SPEEDX){
             left.hold = true;
             this.ScoreL++;
             glfwSetWindowTitle(mWindow.getWindowHandle(), "Pong - " + this.ScoreL + " x " + this.ScoreR);

@@ -8,7 +8,8 @@ import static java.lang.Math.abs;
 class Ball extends GameItem {
     float vx;
     float vz;
-    static float SPEEDX = 0.02f;
+    static float SPEEDX = 0.025f;
+    static float WIDTH = 0.03f;
 
     Ball(Mesh mesh) {
         super(mesh);
@@ -17,11 +18,11 @@ class Ball extends GameItem {
     void reflection(Reflector left, Reflector right) {
         if((this.position.z <= -Game.FieldSizeZ + Game.blockScale*2)||(this.position.z >= Game.FieldSizeZ - Game.blockScale*2))
             vz = -vz;
-        if((this.position.x <= left.getPosition().x+Reflector.WIDTH)&&(abs((this.position.z - left.getPosition().z)) <= Reflector.HEIGHT + abs(vz))){
+        if((this.position.x - WIDTH <= left.getPosition().x+Reflector.WIDTH)&&(abs((this.position.z - left.getPosition().z)) <= Reflector.HEIGHT + abs(vz))){
             vx = -vx;
             vz += left.vy;
         }
-        if((this.position.x >= right.getPosition().x-Reflector.WIDTH)&&(abs((double)(this.position.z - right.getPosition().z)) <= Reflector.HEIGHT + abs(vz))){
+        if((this.position.x + WIDTH >= + right.getPosition().x-Reflector.WIDTH)&&(abs((double)(this.position.z - right.getPosition().z)) <= Reflector.HEIGHT + abs(vz))){
             vx = -vx;
             vz += right.vy;
         }
