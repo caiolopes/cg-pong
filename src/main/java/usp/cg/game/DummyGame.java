@@ -24,8 +24,6 @@ public class DummyGame implements IGameLogic {
 
     private Scene scene;
 
-    private Hud hud;
-
     private float lightAngle;
 
     private static final float CAMERA_POS_STEP = 0.05f;
@@ -147,10 +145,7 @@ public class DummyGame implements IGameLogic {
         
         // Setup Lights
         setupLights();
-        
-        // Create HUD
-        //hud = new Hud("DEMO");
-        
+
         //camera.getPosition().x = 0.65f;
         //camera.getPosition().y = 1.15f;
         //camera.getPosition().y = 4.34f;
@@ -258,9 +253,6 @@ public class DummyGame implements IGameLogic {
         if (mouseInput.isRightButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
-            
-            // Update HUD compass
-            //hud.rotateCompass(camera.getRotation().y);
         }
 
         // Update camera position
@@ -299,8 +291,7 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void render(Window window) {
-        //hud.updateSize(window);
-        renderer.render(window, camera, scene, hud);
+        renderer.render(window, camera, scene);
     }
 
     @Override
@@ -310,7 +301,6 @@ public class DummyGame implements IGameLogic {
         for (Mesh mesh : mapMeshes.keySet()) {
             mesh.cleanUp();
         }
-        //hud.cleanup();
     }
 
 }
