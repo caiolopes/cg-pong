@@ -1,11 +1,12 @@
 package usp.cg.engine;
 
-import static org.lwjgl.glfw.GLFW.*;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
+
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -89,7 +90,6 @@ public class Window {
                 (vidmode.width() - width) / 2,
                 (vidmode.height() - height) / 2
         );
-
         // Make the OpenGL context current
         glfwMakeContextCurrent(windowHandle);
 

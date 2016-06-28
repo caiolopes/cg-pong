@@ -5,14 +5,17 @@ import org.joml.Vector3f;
 import usp.cg.engine.*;
 import usp.cg.engine.graph.*;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class DummyGame implements IGameLogic {
+/**
+ * Classe principal que impleta a interface de lógica do jogo, que inclui ler teclas do teclado, atualizar, inicializar,
+ * etc.
+ */
+public class Game implements IGameLogic {
 
     private static final float MOUSE_SENSITIVITY = 0.2f;
 
@@ -28,7 +31,6 @@ public class DummyGame implements IGameLogic {
 
     private static final float CAMERA_POS_STEP = 0.05f;
 
-    // game
     private boolean isRunning = true;
 
     private Reflector left;
@@ -42,14 +44,24 @@ public class DummyGame implements IGameLogic {
     private int ScoreL = 0;
 
     private int ScoreR = 0;
-    // end game
+
+    private Window mWindow;
+
+    private boolean gameStart = false;
+
+    private boolean gameOver = false;
+
+    private int leftUp = GLFW_KEY_W;
+    private int leftDown = GLFW_KEY_S;
+    private int rightUp = GLFW_KEY_UP;
+    private int rightDown = GLFW_KEY_DOWN;
 
     public static float blockScale = 0.2f;
     public static float skyBoxScale = 9.0f;
     public static float extension = 1.0f;
 
 
-    public DummyGame() {
+    public Game() {
         renderer = new Renderer();
         camera = new Camera();
         cameraInc = new Vector3f(0.0f, 0.0f, 0.0f);
@@ -58,11 +70,11 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void init(Window window) throws Exception {
-        renderer.init(window);
+        mWindow = window;
+        renderer.init(mWindow);
 
         scene = new Scene();
         
-        // Setup  GameItems
         float reflectance = 1f;
         Mesh mesh = OBJLoader.loadMesh("/models/cube.obj");
         Texture texture = new Texture("/textures/grassblock.png");
@@ -97,7 +109,6 @@ public class DummyGame implements IGameLogic {
             posz -= inc;
         }
 
-        // game
         mesh = OBJLoader.loadMesh("/models/cube.obj");
         texture = new Texture("/textures/eraser.png");
         material = new Material(texture, reflectance);
@@ -117,26 +128,10 @@ public class DummyGame implements IGameLogic {
         gameItems[gameItems.length-2] = left;
         gameItems[gameItems.length-1] = right;
 
-        ball.setScale(0.1f);
-        ball.setPosition(0, -0.5f, -10f);
-        left.setScale(0.35f);
-        left.setPosition(-3f, -0.5f, -10f);
-        right.setScale(0.35f);
-        right.setPosition(3f, -0.5f, -10f);
-
-        while (ball.vx == 0) {
-            if ((new Random().nextInt(2)) == 0)
-                ball.vx = -(new Random().nextInt(2)) * Ball.SPEEDX;
-            else
-                ball.vx = (new Random().nextInt(2)) * Ball.SPEEDX;
-        }
-
-        ball.vz = 0;
-        ball.position.x = 0;
-        ball.position.z = 0;
-        // end game
 
         scene.setGameItems(gameItems);
+
+        initialPositions();
 
         // Setup  SkyBox
         SkyBox skyBox = new SkyBox("/models/skybox.obj", "/textures/skybox.png");
@@ -146,25 +141,58 @@ public class DummyGame implements IGameLogic {
         // Setup Lights
         setupLights();
 
-        //camera.getPosition().x = 0.65f;
-        //camera.getPosition().y = 1.15f;
-        //camera.getPosition().y = 4.34f;
+        cameraTop();
+    }
 
-        camera.movePosition(-1.89f, 6.34f, 1.31f);
-        camera.moveRotation(89.65f, -0.072f, 0);
+    private void cameraTop() {
+        camera.setPosition(-0.040611394f, 3.1899922f, 2.9059205f);
+        camera.setRotation(55.00155f, -0.4391871f, 0f);
+
+        leftUp = GLFW_KEY_W;
+        leftDown = GLFW_KEY_S;
+        rightUp = GLFW_KEY_UP;
+        rightDown = GLFW_KEY_DOWN;
+    }
+
+    private void cameraFirstPlayer() {
+        camera.setPosition(-4.1533113f, 1.289994f, -0.07619885f);
+        camera.setRotation(36.7703f, 90.08346f, 0f);
+
+        leftUp = GLFW_KEY_A;
+        leftDown = GLFW_KEY_D;
+        rightUp = GLFW_KEY_LEFT;
+        rightDown = GLFW_KEY_RIGHT;
+    }
+
+    private void initialPositions() {
+        ball.setScale(0.1f);
+        ball.setPosition(0, -0.5f, -10f);
+        left.setScale(0.35f);
+        left.setPosition(-3f, -0.5f, -10f);
+        right.setScale(0.35f);
+        right.setPosition(3f, -0.5f, -10f);
+
+        ball.vz = 0;
+        ball.position.x = 0;
+        ball.position.z = 0;
     }
 
     private boolean win() {
-        if((this.ScoreL == 8)||(this.ScoreR == 8)) {
+        if((this.ScoreL == 5)||(this.ScoreR == 5)) {
+            glfwSetWindowTitle(mWindow.getWindowHandle(), "GAME OVER! Pressione enter para novo jogo" + this.ScoreR + " x " + this.ScoreL);
+            gameStart = false;
+            gameOver = true;
             return false;
         }
         if(ball.position.x < left.position.x + Reflector.WIDTH - Ball.SPEEDX){
             right.hold = true;
             this.ScoreR++;
+            glfwSetWindowTitle(mWindow.getWindowHandle(), "Pong - " + this.ScoreL + " x " + this.ScoreR);
         }
         if(ball.position.x > right.position.x - Reflector.WIDTH + Ball.SPEEDX){
             left.hold = true;
             this.ScoreL++;
+            glfwSetWindowTitle(mWindow.getWindowHandle(), "Pong - " + this.ScoreL + " x " + this.ScoreR);
         }
         return true;
     }
@@ -174,10 +202,10 @@ public class DummyGame implements IGameLogic {
         SceneLight sceneLight = new SceneLight();
         scene.setSceneLight(sceneLight);
 
-        // Ambient Light
+        // Luz ambiente
         sceneLight.setAmbientLight(new Vector3f(1.0f, 1.0f, 1.0f));
 
-        // Directional Light
+        // Luz direcional
         float lightIntensity = 1.0f;
         Vector3f lightPosition = new Vector3f(-1, 0, 0);
         sceneLight.setDirectionalLight(new DirectionalLight(new Vector3f(1, 1, 1), lightPosition, lightIntensity));
@@ -185,11 +213,10 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void input(Window window, MouseInput mouseInput) {
-        // game
-        left.Down = window.isKeyPressed(GLFW_KEY_S);
-        left.Up = window.isKeyPressed(GLFW_KEY_W);
-        right.Down = window.isKeyPressed(GLFW_KEY_DOWN);
-        right.Up = window.isKeyPressed(GLFW_KEY_UP);
+        left.Up = window.isKeyPressed(leftUp);
+        left.Down = window.isKeyPressed(leftDown);
+        right.Up = window.isKeyPressed(rightUp);
+        right.Down = window.isKeyPressed(rightDown);
 
         if(window.isKeyPressed(GLFW_KEY_SPACE)) {
             if (right.hold) {
@@ -199,6 +226,37 @@ public class DummyGame implements IGameLogic {
                 left.hold = false;
                 ball.vx = Ball.SPEEDX;
             }
+        }
+
+        if (gameOver) {
+            if (window.isKeyPressed(GLFW_KEY_ENTER)) {
+                this.ScoreL = 0;
+                this.ScoreR = 0;
+                glfwSetWindowTitle(mWindow.getWindowHandle(), "Pong - " + this.ScoreR + " x " + this.ScoreL);
+                gameStart = false;
+                initialPositions();
+            }
+        }
+
+        if (!gameStart) {
+            if(window.isKeyPressed(GLFW_KEY_SPACE)) {
+                glfwSetWindowTitle(mWindow.getWindowHandle(), "Pong - " + this.ScoreR + " x " + this.ScoreL);
+                while (ball.vx == 0) {
+                    if ((new Random().nextInt(2)) == 0)
+                        ball.vx = -(new Random().nextInt(2)) * Ball.SPEEDX;
+                    else
+                        ball.vx = (new Random().nextInt(2)) * Ball.SPEEDX;
+                }
+                gameStart = true;
+            }
+        }
+
+        if (window.isKeyPressed(GLFW_KEY_1)) {
+            cameraTop();
+        }
+
+        if (window.isKeyPressed(GLFW_KEY_2)) {
+            cameraFirstPlayer();
         }
 
         if((left.Down)&&(!left.Up))
@@ -212,7 +270,12 @@ public class DummyGame implements IGameLogic {
 
         if((!right.Down)&&(right.Up))
             right.vy = -Reflector.SPEEDY;
-        // end game
+
+        if (window.isKeyPressed(GLFW_KEY_C)) {
+            System.out.println("Camera pos x:" + camera.getPosition().x + ", y: "+ camera.getPosition().y + ", z: " + camera.getPosition().z);
+            System.out.println("Camera rot x:" + camera.getRotation().x + ", y: "+ camera.getRotation().y + ", z: " + camera.getRotation().z);
+        }
+
         cameraInc.set(0, 0, 0);
 
         if (window.isKeyPressed(GLFW_KEY_T)) {
@@ -230,35 +293,8 @@ public class DummyGame implements IGameLogic {
         } else if (window.isKeyPressed(GLFW_KEY_X)) {
             cameraInc.y = 1;
         }
-    }
 
-    @Override
-    public void update(float interval, MouseInput mouseInput) {
-        // game
-        isRunning = win();
-        left.move();
-        right.move();
-        ball.move();
-        left.move();
-        right.move();
-        ball.move();
-        ball.reflection(left, right);
-        ball.care(right);
-        ball.care(left);
-        left.vy = 0;
-        right.vy = 0;
-        // end game
-
-        // Update camera based on mouse            
-        if (mouseInput.isRightButtonPressed()) {
-            Vector2f rotVec = mouseInput.getDisplVec();
-            camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
-        }
-
-        // Update camera position
-        camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
-
-        if ((new Date()).getSeconds()%10 == 0) {
+        if (window.isKeyPressed(GLFW_KEY_L)) {
             SceneLight sceneLight = scene.getSceneLight();
 
             // Update directional light direction, intensity and colour
@@ -287,6 +323,32 @@ public class DummyGame implements IGameLogic {
             directionalLight.getDirection().x = (float) Math.sin(angRad);
             directionalLight.getDirection().y = (float) Math.cos(angRad);
         }
+    }
+
+    @Override
+    public void update(float interval, MouseInput mouseInput) {
+        win();
+        left.move();
+        right.move();
+        ball.move();
+        left.move();
+        right.move();
+        ball.move();
+        ball.reflection(left, right);
+        ball.care(right);
+        ball.care(left);
+        left.vy = 0;
+        right.vy = 0;
+
+
+        // Update camera based on mouse            
+        if (mouseInput.isRightButtonPressed()) {
+            Vector2f rotVec = mouseInput.getDisplVec();
+            camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
+        }
+
+        // Update camera position
+        camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
     }
 
     @Override

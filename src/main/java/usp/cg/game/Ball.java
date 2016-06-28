@@ -15,7 +15,7 @@ class Ball extends GameItem {
     }
 
     void reflection(Reflector left, Reflector right) {
-        if((this.position.z <= -DummyGame.FieldSizeZ + DummyGame.blockScale*2)||(this.position.z >= DummyGame.FieldSizeZ - DummyGame.blockScale*2))
+        if((this.position.z <= -Game.FieldSizeZ + Game.blockScale*2)||(this.position.z >= Game.FieldSizeZ - Game.blockScale*2))
             vz = -vz;
         if((this.position.x <= left.getPosition().x+Reflector.WIDTH)&&(abs((this.position.z - left.getPosition().z)) <= Reflector.HEIGHT + abs(vz))){
             vx = -vx;

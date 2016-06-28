@@ -20,12 +20,12 @@ class Reflector extends GameItem {
 
     void move() {
         this.position.z += vy;
-        if(this.position.z <= -DummyGame.FieldSizeZ + HEIGHT){
-            this.position.z = -DummyGame.FieldSizeZ +0.01f + HEIGHT;
+        if(this.position.z <= -Game.FieldSizeZ + HEIGHT){
+            this.position.z = -Game.FieldSizeZ +0.01f + HEIGHT;
             vy = 0;
         }
-        if(this.position.z >= DummyGame.FieldSizeZ - HEIGHT){
-            this.position.z = DummyGame.FieldSizeZ -0.01f - HEIGHT;
+        if(this.position.z >= Game.FieldSizeZ - HEIGHT){
+            this.position.z = Game.FieldSizeZ -0.01f - HEIGHT;
             vy = 0;
         }
     }
